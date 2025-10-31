@@ -1,14 +1,13 @@
 package com.testapp.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -16,12 +15,12 @@ import java.util.UUID;
 @NoArgsConstructor
 public class User {
 
-    private UUID id;
+    @JsonValue
+    private Long id;
     private String username;
     private String firstName;
     private String lastName;
     private String email;
-    @JsonBackReference
     private List<ChatRoom> chatRooms;
 
     @Override

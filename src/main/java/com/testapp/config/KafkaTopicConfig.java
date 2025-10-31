@@ -1,10 +1,10 @@
 package com.testapp.config;
 
+import lombok.NoArgsConstructor;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@NoArgsConstructor
 public class KafkaTopicConfig {
 
     @Value(value = "${spring.kafka.bootstrap-servers:localhost:9092}")
@@ -31,7 +32,7 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic topic1() {
+    public NewTopic testTopic() {
         return new NewTopic("test-topic", 1, (short) 1);
     }
 
@@ -59,13 +60,6 @@ public class KafkaTopicConfig {
         configProps.put(
                 ConsumerConfig.GROUP_ID_CONFIG,
                 groupId);
-        configProps.put(
-                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-                StringDeserializer.class);
-        configProps.put(
-                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                StringDeserializer.class);
-
         return configProps;
     }
 }
