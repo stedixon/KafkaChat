@@ -2,25 +2,34 @@ package com.testapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Data
+@Entity
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
-public class User {
+public class User implements Serializable {
 
-    @JsonValue
-    private Long id;
+    @Id
+    @JoinColumn(name = "user_id")
+    private UUID id;
     private String username;
     private String firstName;
     private String lastName;
     private String email;
+    @OneToMany(mappedBy = "id")
     private List<ChatRoom> chatRooms;
 
     @Override

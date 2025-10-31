@@ -5,14 +5,12 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="1" author="smedina">
-        <createTable tableName="user">
+        <createTable tableName="chat_message">
             <column name="id" type="UUID">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="username" type="VARCHAR (225)"/>
-            <column name="first_name" type="VARCHAR (225)"/>
-            <column name="last_name" type="VARCHAR (225)"/>
-            <column name="email" type="VARCHAR (225)"/>
+            <column name="message" type="VARCHAR (8000)"/>
+            <column name="user_id" type="UUID"/>
             <column name="chat_room_id" type="UUID"/>
         </createTable>
     </changeSet>
