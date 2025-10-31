@@ -1,5 +1,6 @@
 services:
   kafka:
+    container_name: kafka
     image: apache/kafka-native
     ports:
       - "9092:9092"
@@ -20,3 +21,26 @@ services:
 
       # Required for a single node cluster
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  mysql:
+    container_name: mysql
+    image: mysql:8.0 # Or any other desired MySQL version
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password # Replace with a strong password
+      MYSQL_DATABASE: KafkaChat
+      MYSQL_USER: admin # Replace with your preferred username
+      MYSQL_PASSWORD: your_password # Replace with a strong password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql # Persistent storage for MySQL data
+    healthcheck: # Optional: health check for MySQL
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data: # Define the named volume
+  # Optional: You can add specific configurations for the volume here,
+  # such as 'driver' or 'driver_opts' if needed.
+  # For a simple named volume, no further configuration is typically required.
