@@ -22,7 +22,7 @@ public class ChatMessage implements Serializable {
 
     @Id
     @JoinColumn(name = "chat_message_id")
-    private UUID id;
+    private String id;
     private Long userId;
     private String message;
     private ChatRoom chatRoom;

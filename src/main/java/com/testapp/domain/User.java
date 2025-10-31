@@ -2,10 +2,12 @@ package com.testapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonValue;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,10 +26,16 @@ public class User implements Serializable {
 
     @Id
     @JoinColumn(name = "user_id")
-    private UUID id;
+    private String id;
+    @NotNull
     private String username;
+    @NotNull
+    @Column(name = "first_name")
     private String firstName;
+    @NotNull
+    @Column(name = "last_name")
     private String lastName;
+    @NotNull
     private String email;
     @OneToMany(mappedBy = "id")
     private List<ChatRoom> chatRooms;

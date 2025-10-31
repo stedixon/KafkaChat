@@ -2,6 +2,7 @@ package com.testapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonValue;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -24,7 +25,8 @@ public class ChatRoom implements Serializable {
 
     @Id
     @JoinColumn(name = "chat_room_id")
-    private UUID id;
+    private String id;
+    @Column(name = "display_name")
     private String displayName;
     private String description;
     @OneToMany(mappedBy = "id")

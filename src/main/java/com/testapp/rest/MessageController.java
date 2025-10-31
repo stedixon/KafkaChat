@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "/messages")
+@RequestMapping(path = "/message")
 public class MessageController {
 
     @Autowired
@@ -21,7 +21,7 @@ public class MessageController {
 
     private static final Logger log = LoggerFactory.getLogger(MessageController.class);
 
-    @PostMapping("/chatRoom/{chatRoom}/")
+    @PostMapping("/chatRoom/{chatRoom}")
     public ResponseEntity<?> sendMessage(@PathVariable String chatRoom,
                                         @RequestBody ChatMessage chatMessage) {
         log.info("Sending message {} to chat room {}", chatMessage, chatRoom);
