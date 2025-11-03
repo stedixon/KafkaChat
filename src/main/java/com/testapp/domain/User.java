@@ -1,6 +1,5 @@
 package com.testapp.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,8 +10,11 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 @Data
@@ -21,21 +23,53 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @Table(name = "user")
-public class User implements Serializable {
+public class User implements UserDetails {
 
     @Id
     @JoinColumn(name = "user_id")
     private String id;
+
     @NotNull
     private String username;
+
+    @Column(nullable = false)
+    private String password;
+
     @NotNull
     @Column(name = "first_name")
     private String firstName;
+
     @NotNull
     @Column(name = "last_name")
     private String lastName;
+
     @NotNull
     private String email;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 
     @Override
     public boolean equals(Object o) {

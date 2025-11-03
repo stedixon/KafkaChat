@@ -15,6 +15,7 @@
             <column name="first_name" type="VARCHAR (225)"/>
             <column name="last_name" type="VARCHAR (225)"/>
             <column name="email" type="VARCHAR (225)"/>
+            <column name="password" type="VARCHAR (225)"/>
         </createTable>
     </changeSet>
 

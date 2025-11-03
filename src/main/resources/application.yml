@@ -3,6 +3,11 @@ spring:
     change-log: classpath:db/master.xml
   datasource:
     url: jdbc:mysql://localhost:3306/KafkaChat?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
-    username: admin
-    password: your_password
+    username: ${SQL_USERNAME}
+    password: ${SQL_PASSWORD}
     jpa.hibernate.ddl-auto: none
+
+security:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}
+    expiration-time: 3600000 # 1h in millisecond

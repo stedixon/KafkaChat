@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +26,19 @@ public class UserController {
     private final UserService userService;
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getMe() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) authentication.getPrincipal();
+
+        log.info("Getting myself for id {}", currentUser.getId());
+        try {
+            return ResponseEntity.ok(userService.getUser(currentUser.getId()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to get me");
+        }
+    }
 
     @GetMapping("/id/{id}")
     public ResponseEntity<?> getUser(@PathVariable String id) {
