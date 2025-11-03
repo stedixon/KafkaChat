@@ -5,16 +5,15 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="1" author="smedina">
-        <createTable tableName="chat_message">
-            <column name="id" type="VARCHAR (36)">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="message" type="VARCHAR (8000)"/>
+        <createTable tableName="room_management">
             <column name="user_id" type="VARCHAR (36)"/>
             <column name="chat_room_id" type="VARCHAR (36)"/>
-            <column name="timeSent" type="TIMESTAMP"/>
         </createTable>
-<!--        TODO create index on chat room and timestamp-->
+        <addPrimaryKey
+                tableName="room_management"
+                columnNames="user_id, chat_room_id"
+                constraintName="pk_user_room"
+        />
     </changeSet>
 
 </databaseChangeLog>

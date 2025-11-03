@@ -9,7 +9,9 @@
             <column name="id" type="VARCHAR (36)">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="display_name" type="VARCHAR (225)"/>
+            <column name="display_name" type="VARCHAR (225)">
+                <constraints unique="true"/>
+            </column>
             <column name="description" type="VARCHAR (225)"/>
         </createTable>
     </changeSet>

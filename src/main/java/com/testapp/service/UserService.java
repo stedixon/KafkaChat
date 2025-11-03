@@ -9,6 +9,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,6 +21,10 @@ public class UserService {
 
     public User getUser(String id) {
         return userRepository.findById(id).orElse(null);
+    }
+
+    public List<User> getUsersInChatRoom(String chatRoomId) {
+        return userRepository.findByChatRoomId(chatRoomId);
     }
 
     public User createUser(User user) {
