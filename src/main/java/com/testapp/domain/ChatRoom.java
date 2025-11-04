@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,19 +30,21 @@ public class ChatRoom implements Serializable {
     @Column(name = "display_name")
     private String displayName;
     private String description;
-    private int participantCount;
+    @ManyToOne
+    @JoinColumn(name = "admin_id")
+    private User admin;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChatRoom chatRoom = (ChatRoom) o;
-        return Objects.equals(id, chatRoom.id) && Objects.equals(displayName, chatRoom.displayName) && Objects.equals(description, chatRoom.description) && Objects.equals(participantCount, chatRoom.participantCount);
+        return Objects.equals(id, chatRoom.id) && Objects.equals(displayName, chatRoom.displayName) && Objects.equals(description, chatRoom.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, displayName, description, participantCount);
+        return Objects.hash(id, displayName, description);
     }
 
     @Override
@@ -48,7 +53,6 @@ public class ChatRoom implements Serializable {
                 "id=" + id +
                 ", displayName='" + displayName + '\'' +
                 ", description='" + description + '\'' +
-                ", participants=" + participantCount +
                 '}';
     }
 }

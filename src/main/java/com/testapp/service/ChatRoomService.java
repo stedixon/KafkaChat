@@ -19,7 +19,7 @@ public class ChatRoomService {
     private final RoomManagementRepository roomManagementRepository;
 
     public ChatRoom getChatRoom(String id) {
-        return chatRoomRepository.findByIdWithParticipantCount(id).orElse(null);
+        return chatRoomRepository.findById(id).orElse(null);
     }
 
     public ChatRoom createChatRoom(ChatRoom chatRoom) {
@@ -29,7 +29,9 @@ public class ChatRoomService {
         }
 
         chatRoom.setId(UUID.randomUUID().toString());
-        return chatRoomRepository.save(chatRoom);
+        ChatRoom room = chatRoomRepository.save(chatRoom);
+        roomManagementRepository.save(new RoomManagement(chatRoom.getAdmin().getId(), room.getId()));
+        return room;
     }
 
     public RoomManagement addUserToRoom(String chatRoomId, String userId) {
