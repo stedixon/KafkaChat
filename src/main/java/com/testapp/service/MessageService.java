@@ -1,6 +1,7 @@
 package com.testapp.service;
 
 import com.testapp.domain.ChatMessage;
+import com.testapp.domain.ChatRoom;
 import com.testapp.kafka.KProducer;
 import com.testapp.repository.ChatMessageRepository;
 import lombok.NonNull;
@@ -9,6 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.UUID;
+
+import static com.testapp.config.Constants.CHAT_MESSAGE_TOPIC;
 
 @Service
 @RequiredArgsConstructor
@@ -19,13 +25,17 @@ public class MessageService {
     private final KProducer messageProducer;
     private final ChatMessageRepository messageRepository;
 
-    @KafkaListener(topics = "test-topic", containerFactory = "chatMessageContainerFactory")
+    @KafkaListener(topics = CHAT_MESSAGE_TOPIC, containerFactory = "chatMessageContainerFactory")
     public void chatMessageListener(ChatMessage message) {
         log.info("received message {}", message);
         messageRepository.save(message);
     }
 
-    public void sendMessage(ChatMessage chatMessage) {
-        messageProducer.sendMessage(chatMessage);
+    public ChatMessage sendMessage(String chatRoomId, ChatMessage chatMessage) {
+        chatMessage.setId(UUID.randomUUID().toString());
+        chatMessage.setChatRoom(new ChatRoom(chatRoomId));
+        chatMessage.setTimeSent(Instant.now());
+        messageProducer.sendMessage(chatRoomId, chatMessage);
+        return messageRepository.save(chatMessage);
     }
 }

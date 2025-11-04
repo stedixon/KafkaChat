@@ -4,15 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 
 @Data
 @Entity
@@ -25,8 +25,11 @@ public class ChatMessage implements Serializable {
     @Id
     @JoinColumn(name = "chat_message_id")
     private String id;
-    private Long userId;
+    private String userId;
+    @NonNull
     private String message;
+    @ManyToOne
+    @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
     private Instant timeSent;
 

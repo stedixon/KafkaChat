@@ -6,6 +6,7 @@ import com.testapp.exceptions.UserExistsException;
 import com.testapp.repository.ChatRoomRepository;
 import com.testapp.repository.RoomManagementRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -23,6 +24,9 @@ public class ChatRoomService {
     }
 
     public ChatRoom createChatRoom(ChatRoom chatRoom) {
+        if (Strings.isEmpty(chatRoom.getDisplayName())) {
+            throw new RuntimeException("Display name cannot be empty");
+        }
         Optional<ChatRoom> existing = chatRoomRepository.findByDisplayName(chatRoom.getDisplayName());
         if (existing.isPresent()) {
             throw new UserExistsException("Chat Room " + chatRoom.getDisplayName() + " is already taken.");

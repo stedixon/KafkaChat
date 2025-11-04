@@ -25,14 +25,18 @@ import java.util.Objects;
 public class ChatRoom implements Serializable {
 
     @Id
+    @JoinColumn(name = "chat_room_id")
     private String id;
-    @NonNull
     @Column(name = "display_name")
     private String displayName;
     private String description;
     @ManyToOne
     @JoinColumn(name = "admin_id")
     private User admin;
+
+    public ChatRoom(String id) {
+        this.id = id;
+    }
 
     @Override
     public boolean equals(Object o) {

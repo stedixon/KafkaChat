@@ -1,6 +1,7 @@
 package com.testapp.kafka;
 
 import com.testapp.domain.ChatMessage;
+import com.testapp.repository.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
@@ -11,17 +12,19 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
 
+import static com.testapp.config.Constants.CHAT_MESSAGE_TOPIC;
+
 @Component
 @RequiredArgsConstructor
 public class KProducer {
 
-    private final KafkaTemplate<String, ChatMessage> kafkaChatMessageTemplate;
-
     private static final Logger log = LoggerFactory.getLogger(KProducer.class);
 
-    public void sendMessage(ChatMessage message) {
+    private final KafkaTemplate<String, ChatMessage> kafkaChatMessageTemplate;
+
+    public void sendMessage(String chatRoomId, ChatMessage message) {
         ProducerRecord<String, ChatMessage> record = new ProducerRecord<>(
-                "test-topic", message
+                CHAT_MESSAGE_TOPIC, chatRoomId, message
         );
 
         CompletableFuture<SendResult<String, ChatMessage>> future = kafkaChatMessageTemplate

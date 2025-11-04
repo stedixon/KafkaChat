@@ -14,6 +14,8 @@ import org.springframework.kafka.core.KafkaAdmin;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.testapp.config.Constants.CHAT_MESSAGE_TOPIC;
+
 @Configuration
 @NoArgsConstructor
 public class KafkaTopicConfig {
@@ -32,8 +34,8 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic testTopic() {
-        return new NewTopic("test-topic", 1, (short) 1);
+    public NewTopic createMessageTopic() {
+        return new NewTopic(CHAT_MESSAGE_TOPIC, 5, (short) 1);
     }
 
     private Map<String, Object> buildCommonProperties() {
