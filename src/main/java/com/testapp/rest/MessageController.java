@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping(path = "/message")
 public class MessageController {
@@ -25,6 +27,7 @@ public class MessageController {
     public ResponseEntity<?> sendMessage(@PathVariable String chatRoom,
                                         @RequestBody ChatMessage chatMessage) {
         log.info("Sending message {} to chat room {}", chatMessage, chatRoom);
+        chatMessage.setId(UUID.randomUUID().toString());
         messageService.sendMessage(chatMessage);
         return ResponseEntity.ok().build();
     }
