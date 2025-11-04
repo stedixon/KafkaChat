@@ -8,6 +8,7 @@
         <createTable tableName="room_management">
             <column name="user_id" type="VARCHAR (36)"/>
             <column name="chat_room_id" type="VARCHAR (36)"/>
+            <column name="is_admin" type="BOOLEAN" defaultValue="false"/>
         </createTable>
         <addPrimaryKey
                 tableName="room_management"

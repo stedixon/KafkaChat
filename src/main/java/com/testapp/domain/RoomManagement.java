@@ -29,6 +29,15 @@ public class RoomManagement implements Serializable {
     @Column(name = "chat_room_id")
     private String chatRoomId;
 
+    @Column(name = "is_admin")
+    private boolean isAdmin;
+
+    public RoomManagement(String userId, String chatRoomId) {
+        this.userId = userId;
+        this.chatRoomId = chatRoomId;
+        this.isAdmin = false;
+    }
+
     @Override
     public String toString() {
         return "RoomManagement{" +

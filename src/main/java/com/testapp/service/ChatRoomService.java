@@ -30,7 +30,7 @@ public class ChatRoomService {
 
         chatRoom.setId(UUID.randomUUID().toString());
         ChatRoom room = chatRoomRepository.save(chatRoom);
-        roomManagementRepository.save(new RoomManagement(chatRoom.getAdmin().getId(), room.getId()));
+        roomManagementRepository.save(new RoomManagement(chatRoom.getAdmin().getId(), room.getId(), true));
         return room;
     }
 
