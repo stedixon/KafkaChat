@@ -1,6 +1,7 @@
 package com.testapp.rest;
 
 import com.testapp.domain.ChatRoom;
+import com.testapp.domain.User;
 import com.testapp.exceptions.UserExistsException;
 import com.testapp.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +43,9 @@ public class ChatRoomController {
     public ResponseEntity<?> createChatRoom(@RequestBody @Validated ChatRoom chatRoom) {
         log.info("Creating chatRoom {}", chatRoom);
         try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User currentUser = (User) authentication.getPrincipal();
+            chatRoom.setAdmin(currentUser);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(chatRoomService.createChatRoom(chatRoom));
         } catch (UserExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Chat Room name is already taken");
@@ -52,7 +58,9 @@ public class ChatRoomController {
     public ResponseEntity<?> joinRoom(@PathVariable String roomId, @PathVariable String userId) {
         log.info("Adding user {} to room {}", userId, roomId);
         try {
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(chatRoomService.addUserToRoom(roomId, userId));
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .body(chatRoomService
+                            .addUserToRoom(ChatRoom.builder().id(roomId).build(), User.builder().id(userId).build()));
         } catch (UserExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("User is already in room");
         } catch (Exception e) {

@@ -25,7 +25,9 @@ public class ChatMessage implements Serializable {
     @Id
     @JoinColumn(name = "chat_message_id")
     private String id;
-    private String userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User userId;
     @NonNull
     private String message;
     @ManyToOne

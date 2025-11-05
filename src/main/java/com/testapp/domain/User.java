@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,6 +24,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
+@Builder
 @Table(name = "user")
 public class User implements UserDetails {
 
