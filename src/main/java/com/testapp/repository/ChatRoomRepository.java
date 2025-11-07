@@ -1,14 +1,12 @@
 package com.testapp.repository;
 
 
-import com.testapp.domain.ChatRoom;
+import com.testapp.domain.dto.ChatRoomDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface ChatRoomRepository extends JpaRepository<ChatRoom, String> {
+public interface ChatRoomRepository extends JpaRepository<ChatRoomDTO, String> {
 
-    Optional<ChatRoom> findByDisplayName(String displayName);
+    Optional<ChatRoomDTO> findByDisplayName(String displayName);
 }

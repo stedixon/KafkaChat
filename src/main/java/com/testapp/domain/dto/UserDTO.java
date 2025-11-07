@@ -1,4 +1,4 @@
-package com.testapp.domain;
+package com.testapp.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -26,7 +26,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder
 @Table(name = "user")
-public class User implements UserDetails {
+public class UserDTO implements UserDetails {
 
     @Id
     @JoinColumn(name = "user_id")
@@ -84,7 +84,7 @@ public class User implements UserDetails {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
+        UserDTO user = (UserDTO) o;
         return Objects.equals(id, user.id) && Objects.equals(username, user.username) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email);
     }
 

@@ -1,5 +1,6 @@
 package com.testapp.domain;
 
+import com.testapp.domain.dto.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +17,7 @@ public class ChatRoomDetails {
     private String id;
     private String displayName;
     private String description;
-    private User admin;
+    private UserDTO admin;
     private int participantCount;
 
     @Override

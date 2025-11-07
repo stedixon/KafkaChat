@@ -1,7 +1,6 @@
 package com.testapp.kafka;
 
-import com.testapp.domain.ChatMessage;
-import com.testapp.repository.ChatMessageRepository;
+import com.testapp.domain.dto.ChatMessageDTO;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +16,8 @@ public class KConsumer {
     private static final Logger log = LoggerFactory.getLogger(KConsumer.class);
 
     @KafkaListener(topics = CHAT_MESSAGE_TOPIC, containerFactory = "chatMessageContainerFactory")
-    public void chatMessageListener(ChatMessage message) {
+    public void chatMessageListener(ChatMessageDTO message) {
         log.info("received message {}", message);
-        //TODO send them to the right chat room
+        //TODO send to user controller
     }
 }

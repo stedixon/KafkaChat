@@ -3,7 +3,7 @@ package com.testapp.rest;
 import com.testapp.domain.LoginResponse;
 import com.testapp.domain.LoginUser;
 import com.testapp.domain.RegisterUser;
-import com.testapp.domain.User;
+import com.testapp.domain.dto.UserDTO;
 import com.testapp.service.AuthenticationService;
 import com.testapp.service.JwtService;
 import org.springframework.http.ResponseEntity;
@@ -25,15 +25,15 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> register(@RequestBody RegisterUser registerUserDto) {
-        User registeredUser = authenticationService.signup(registerUserDto);
+    public ResponseEntity<UserDTO> register(@RequestBody RegisterUser registerUserDto) {
+        UserDTO registeredUser = authenticationService.signup(registerUserDto);
 
         return ResponseEntity.ok(registeredUser);
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUser loginUserDto) {
-        User authenticatedUser = authenticationService.authenticate(loginUserDto);
+        UserDTO authenticatedUser = authenticationService.authenticate(loginUserDto);
 
         String jwtToken = jwtService.generateToken(authenticatedUser);
 

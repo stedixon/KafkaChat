@@ -1,9 +1,7 @@
 package com.testapp.repository;
 
 
-import com.testapp.domain.ChatRoom;
 import com.testapp.domain.RoomManagement;
-import com.testapp.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

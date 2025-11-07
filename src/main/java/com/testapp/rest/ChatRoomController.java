@@ -1,7 +1,7 @@
 package com.testapp.rest;
 
-import com.testapp.domain.ChatRoom;
-import com.testapp.domain.User;
+import com.testapp.domain.dto.ChatRoomDTO;
+import com.testapp.domain.dto.UserDTO;
 import com.testapp.exceptions.UserExistsException;
 import com.testapp.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
@@ -40,13 +40,13 @@ public class ChatRoomController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createChatRoom(@RequestBody @Validated ChatRoom chatRoom) {
-        log.info("Creating chatRoom {}", chatRoom);
+    public ResponseEntity<?> createChatRoom(@RequestBody @Validated ChatRoomDTO chatRoomDTO) {
+        log.info("Creating chatRoom {}", chatRoomDTO);
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            User currentUser = (User) authentication.getPrincipal();
-            chatRoom.setAdmin(currentUser);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(chatRoomService.createChatRoom(chatRoom));
+            UserDTO currentUser = (UserDTO) authentication.getPrincipal();
+            chatRoomDTO.setAdmin(currentUser);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(chatRoomService.createChatRoom(chatRoomDTO));
         } catch (UserExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Chat Room name is already taken");
         } catch (Exception e) {
@@ -60,7 +60,7 @@ public class ChatRoomController {
         try {
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body(chatRoomService
-                            .addUserToRoom(ChatRoom.builder().id(roomId).build(), User.builder().id(userId).build()));
+                            .addUserToRoom(ChatRoomDTO.builder().id(roomId).build(), UserDTO.builder().id(userId).build()));
         } catch (UserExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("User is already in room");
         } catch (Exception e) {

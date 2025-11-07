@@ -1,6 +1,6 @@
 package com.testapp.config;
 
-import com.testapp.domain.ChatMessage;
+import com.testapp.domain.dto.ChatMessageDTO;
 import com.testapp.domain.ChatMessageKey;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -20,14 +20,14 @@ public class KafkaProducerConfig {
     private final KafkaTopicConfig kafkaConfig;
 
     @Bean
-    public ProducerFactory<ChatMessageKey, ChatMessage> producerChatMessageFactory() {
+    public ProducerFactory<ChatMessageKey, ChatMessageDTO> producerChatMessageFactory() {
         Map<String, Object> props = kafkaConfig.buildProducerProperties();
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         return new DefaultKafkaProducerFactory<>(props);
     }
 
     @Bean
-    public KafkaTemplate<ChatMessageKey, ChatMessage> kafkaChatMessageTemplate() {
+    public KafkaTemplate<ChatMessageKey, ChatMessageDTO> kafkaChatMessageTemplate() {
         return new KafkaTemplate<>(producerChatMessageFactory());
     }
 

@@ -1,6 +1,6 @@
 package com.testapp.rest;
 
-import com.testapp.domain.User;
+import com.testapp.domain.dto.UserDTO;
 import com.testapp.exceptions.UserExistsException;
 import com.testapp.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<?> getMe() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
+        UserDTO currentUser = (UserDTO) authentication.getPrincipal();
 
         log.info("Getting myself for id {}", currentUser.getId());
         try {
@@ -61,7 +61,7 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createUser(@Validated @RequestBody User user) {
+    public ResponseEntity<?> createUser(@Validated @RequestBody UserDTO user) {
         log.info("Creating user {}", user);
         try {
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.createUser(user));

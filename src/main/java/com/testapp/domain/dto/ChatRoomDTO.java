@@ -1,4 +1,4 @@
-package com.testapp.domain;
+package com.testapp.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
@@ -6,13 +6,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -24,7 +22,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder
 @Table(name = "chat_room")
-public class ChatRoom implements Serializable {
+public class ChatRoomDTO implements Serializable {
 
     @Id
     @JoinColumn(name = "chat_room_id")
@@ -34,9 +32,9 @@ public class ChatRoom implements Serializable {
     private String description;
     @ManyToOne
     @JoinColumn(name = "admin_id")
-    private User admin;
+    private UserDTO admin;
 
-    public ChatRoom(String id) {
+    public ChatRoomDTO(String id) {
         this.id = id;
     }
 
@@ -44,8 +42,8 @@ public class ChatRoom implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ChatRoom chatRoom = (ChatRoom) o;
-        return Objects.equals(id, chatRoom.id) && Objects.equals(displayName, chatRoom.displayName) && Objects.equals(description, chatRoom.description);
+        ChatRoomDTO chatRoomDTO = (ChatRoomDTO) o;
+        return Objects.equals(id, chatRoomDTO.id) && Objects.equals(displayName, chatRoomDTO.displayName) && Objects.equals(description, chatRoomDTO.description);
     }
 
     @Override

@@ -1,9 +1,9 @@
 package com.testapp.service;
 
-import com.testapp.domain.ChatRoom;
+import com.testapp.domain.dto.ChatRoomDTO;
 import com.testapp.domain.ChatRoomDetails;
 import com.testapp.domain.RoomManagement;
-import com.testapp.domain.User;
+import com.testapp.domain.dto.UserDTO;
 import com.testapp.exceptions.UserExistsException;
 import com.testapp.repository.ChatRoomRepository;
 import com.testapp.repository.RoomManagementRepository;
@@ -24,7 +24,7 @@ public class ChatRoomService {
     private final RoomManagementRepository roomManagementRepository;
 
     public ChatRoomDetails getChatRoom(String id) {
-        Optional<ChatRoom> chatRoom = chatRoomRepository.findById(id);
+        Optional<ChatRoomDTO> chatRoom = chatRoomRepository.findById(id);
         if (chatRoom.isPresent()) {
             int participantCount = roomManagementRepository.findParticipantCountByChatRoomId(id);
             return createRoomDetails(chatRoom.get(), participantCount);
@@ -32,7 +32,7 @@ public class ChatRoomService {
         return null;
     }
 
-    public List<User> getChatParticipants(String id) {
+    public List<UserDTO> getChatParticipants(String id) {
         List<RoomManagement> userList = roomManagementRepository.findByChatRoomId(id);
 
         return userList.stream()
@@ -40,17 +40,17 @@ public class ChatRoomService {
                 .collect(Collectors.toList());
     }
 
-    public ChatRoom createChatRoom(ChatRoom chatRoom) {
-        if (Strings.isEmpty(chatRoom.getDisplayName())) {
+    public ChatRoomDTO createChatRoom(ChatRoomDTO chatRoomDTO) {
+        if (Strings.isEmpty(chatRoomDTO.getDisplayName())) {
             throw new RuntimeException("Display name cannot be empty");
         }
-        Optional<ChatRoom> existing = chatRoomRepository.findByDisplayName(chatRoom.getDisplayName());
+        Optional<ChatRoomDTO> existing = chatRoomRepository.findByDisplayName(chatRoomDTO.getDisplayName());
         if (existing.isPresent()) {
-            throw new UserExistsException("Chat Room " + chatRoom.getDisplayName() + " is already taken.");
+            throw new UserExistsException("Chat Room " + chatRoomDTO.getDisplayName() + " is already taken.");
         }
 
-        chatRoom.setId(UUID.randomUUID().toString());
-        ChatRoom room = chatRoomRepository.save(chatRoom);
+        chatRoomDTO.setId(UUID.randomUUID().toString());
+        ChatRoomDTO room = chatRoomRepository.save(chatRoomDTO);
         roomManagementRepository.save(RoomManagement.builder()
                 .id(new RoomManagement.RoomManagementId(room.getAdmin().getId(), room.getId()))
                 .chatRoom(room)
@@ -60,16 +60,16 @@ public class ChatRoomService {
         return room;
     }
 
-    public RoomManagement addUserToRoom(ChatRoom chatRoom, User user) {
-        Optional<RoomManagement> existing = roomManagementRepository.findByUserIdAndChatRoomId(user.getId(), chatRoom.getId());
+    public RoomManagement addUserToRoom(ChatRoomDTO chatRoomDTO, UserDTO user) {
+        Optional<RoomManagement> existing = roomManagementRepository.findByUserIdAndChatRoomId(user.getId(), chatRoomDTO.getId());
         if (existing.isPresent()) {
-            throw new UserExistsException("User " + user.getId() + " is already in chat room " + chatRoom.getId());
+            throw new UserExistsException("User " + user.getId() + " is already in chat room " + chatRoomDTO.getId());
         }
 
-        return roomManagementRepository.save(new RoomManagement(user, chatRoom));
+        return roomManagementRepository.save(new RoomManagement(user, chatRoomDTO));
     }
 
-    private ChatRoomDetails createRoomDetails(ChatRoom room, int participantCount) {
+    private ChatRoomDetails createRoomDetails(ChatRoomDTO room, int participantCount) {
         return ChatRoomDetails.builder()
                 .id(room.getId())
                 .admin(room.getAdmin())

@@ -1,7 +1,7 @@
 package com.testapp.rest;
 
-import com.testapp.domain.ChatMessage;
-import com.testapp.domain.User;
+import com.testapp.domain.dto.ChatMessageDTO;
+import com.testapp.domain.dto.UserDTO;
 import com.testapp.service.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,13 +26,13 @@ public class MessageController {
 
     @PostMapping("/chatRoom/{chatRoom}")
     public ResponseEntity<?> sendMessage(@PathVariable String chatRoom,
-                                        @RequestBody ChatMessage chatMessage) {
+                                        @RequestBody ChatMessageDTO chatMessageDTO) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-        chatMessage.setUserId(currentUser);
-        log.info("Sending message {} to chat room {}", chatMessage, chatRoom);
+        UserDTO currentUser = (UserDTO) authentication.getPrincipal();
+        chatMessageDTO.setUserId(currentUser);
+        log.info("Sending message {} to chat room {}", chatMessageDTO, chatRoom);
 
-        return ResponseEntity.ok().body(messageService.sendMessage(chatRoom, chatMessage));
+        return ResponseEntity.ok().body(messageService.sendMessage(chatRoom, chatMessageDTO));
     }
 }

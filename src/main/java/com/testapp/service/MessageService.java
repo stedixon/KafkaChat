@@ -1,7 +1,7 @@
 package com.testapp.service;
 
-import com.testapp.domain.ChatMessage;
-import com.testapp.domain.ChatRoom;
+import com.testapp.domain.dto.ChatMessageDTO;
+import com.testapp.domain.dto.ChatRoomDTO;
 import com.testapp.kafka.KProducer;
 import com.testapp.repository.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +21,11 @@ public class MessageService {
     private final KProducer messageProducer;
     private final ChatMessageRepository messageRepository;
 
-    public ChatMessage sendMessage(String chatRoomId, ChatMessage chatMessage) {
-        chatMessage.setId(UUID.randomUUID().toString());
-        chatMessage.setChatRoom(new ChatRoom(chatRoomId));
-        chatMessage.setTimeSent(Instant.now());
-        messageProducer.sendMessage(chatRoomId, chatMessage);
-        return messageRepository.save(chatMessage);
+    public ChatMessageDTO sendMessage(String chatRoomId, ChatMessageDTO chatMessageDTO) {
+        chatMessageDTO.setId(UUID.randomUUID().toString());
+        chatMessageDTO.setChatRoomDTO(new ChatRoomDTO(chatRoomId));
+        chatMessageDTO.setTimeSent(Instant.now());
+        messageProducer.sendMessage(chatRoomId, chatMessageDTO);
+        return messageRepository.save(chatMessageDTO);
     }
 }

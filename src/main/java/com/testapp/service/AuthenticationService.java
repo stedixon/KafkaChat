@@ -2,7 +2,7 @@ package com.testapp.service;
 
 import com.testapp.domain.LoginUser;
 import com.testapp.domain.RegisterUser;
-import com.testapp.domain.User;
+import com.testapp.domain.dto.UserDTO;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,8 +27,8 @@ public class AuthenticationService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User signup(RegisterUser input) {
-        User user = new User();
+    public UserDTO signup(RegisterUser input) {
+        UserDTO user = new UserDTO();
         user.setFirstName(input.getFirstName());
         user.setLastName(input.getLastName());
         user.setUsername(input.getUsername());
@@ -38,7 +38,7 @@ public class AuthenticationService {
         return userService.createUser(user);
     }
 
-    public User authenticate(LoginUser input) {
+    public UserDTO authenticate(LoginUser input) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         input.getUsername(),
@@ -46,7 +46,7 @@ public class AuthenticationService {
                 )
         );
 
-        User user = userService.getUserByUsername(input.getUsername());
+        UserDTO user = userService.getUserByUsername(input.getUsername());
 
         if (user == null) {
             throw new RuntimeException("Unable to login");

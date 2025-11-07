@@ -1,6 +1,8 @@
 package com.testapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.testapp.domain.dto.ChatRoomDTO;
+import com.testapp.domain.dto.UserDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
@@ -30,24 +32,24 @@ public class RoomManagement implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
-    private User user;
+    private UserDTO user;
 
     @ManyToOne
     @JoinColumn(name = "chat_room_id", insertable = false, updatable = false)
-    private ChatRoom chatRoom;
+    private ChatRoomDTO chatRoom;
 
     @Column(name = "is_admin")
     private boolean isAdmin;
 
-    public RoomManagement(User userId, ChatRoom chatRoomId) {
+    public RoomManagement(UserDTO userId, ChatRoomDTO chatRoomDTOId) {
         this.user = userId;
-        this.chatRoom = chatRoomId;
+        this.chatRoom = chatRoomDTOId;
         this.isAdmin = false;
     }
 
-    public RoomManagement(User userId, ChatRoom chatRoomId, boolean isAdmin) {
+    public RoomManagement(UserDTO userId, ChatRoomDTO chatRoomDTOId, boolean isAdmin) {
         this.user = userId;
-        this.chatRoom = chatRoomId;
+        this.chatRoom = chatRoomDTOId;
         this.isAdmin = isAdmin;
     }
 
