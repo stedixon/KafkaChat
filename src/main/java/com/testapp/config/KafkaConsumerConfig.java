@@ -1,7 +1,7 @@
 package com.testapp.config;
 
 import com.testapp.domain.ChatMessage;
-import org.apache.kafka.common.serialization.StringDeserializer;
+import com.testapp.domain.ChatMessageKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,17 +19,17 @@ public class KafkaConsumerConfig {
     private KafkaTopicConfig kafkaConfig;
 
     @Bean
-    public ConsumerFactory<String, ChatMessage> consumerFactory() {
+    public ConsumerFactory<ChatMessageKey, ChatMessage> consumerFactory() {
         return new DefaultKafkaConsumerFactory<>(
                 kafkaConfig.buildConsumerProperties(),
-                new StringDeserializer(),
+                new JsonDeserializer<>(ChatMessageKey.class),
                 new JsonDeserializer<>(ChatMessage.class)
         );
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, ChatMessage> chatMessageContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, ChatMessage> factory =
+    public ConcurrentKafkaListenerContainerFactory<ChatMessageKey, ChatMessage> chatMessageContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<ChatMessageKey, ChatMessage> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         return factory;

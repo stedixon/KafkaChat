@@ -1,7 +1,7 @@
 package com.testapp.kafka;
 
 import com.testapp.domain.ChatMessage;
-import com.testapp.repository.ChatMessageRepository;
+import com.testapp.domain.ChatMessageKey;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
@@ -20,14 +20,17 @@ public class KProducer {
 
     private static final Logger log = LoggerFactory.getLogger(KProducer.class);
 
-    private final KafkaTemplate<String, ChatMessage> kafkaChatMessageTemplate;
+    private final KafkaTemplate<ChatMessageKey, ChatMessage> kafkaChatMessageTemplate;
 
     public void sendMessage(String chatRoomId, ChatMessage message) {
-        ProducerRecord<String, ChatMessage> record = new ProducerRecord<>(
-                CHAT_MESSAGE_TOPIC, chatRoomId, message
+        ChatMessageKey key = new ChatMessageKey(chatRoomId, message.getUserId().getId(), message.getId());
+        ProducerRecord<ChatMessageKey, ChatMessage> record = new ProducerRecord<>(
+                CHAT_MESSAGE_TOPIC,
+                key,
+                message
         );
 
-        CompletableFuture<SendResult<String, ChatMessage>> future = kafkaChatMessageTemplate
+        CompletableFuture<SendResult<ChatMessageKey, ChatMessage>> future = kafkaChatMessageTemplate
                 .send(record);
         future.whenComplete((result, ex) -> {
             if (ex == null) {
