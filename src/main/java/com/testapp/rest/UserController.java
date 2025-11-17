@@ -60,6 +60,16 @@ public class UserController {
         }
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllUsers() {
+        log.info("Getting all users");
+        try {
+            return ResponseEntity.ok(userService.getAllUsers());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to get users");
+        }
+    }
+
     @PostMapping("/create")
     public ResponseEntity<?> createUser(@Validated @RequestBody UserDTO user) {
         log.info("Creating user {}", user);

@@ -67,4 +67,32 @@ public class ChatRoomController {
             return ResponseEntity.internalServerError().body("Failed to add user to room: " + e.getMessage());
         }
     }
+
+    @GetMapping("/myRooms")
+    public ResponseEntity<?> getMyChatRooms() {
+        log.info("Getting chat rooms for current user");
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDTO currentUser = (UserDTO) authentication.getPrincipal();
+            return ResponseEntity.ok(chatRoomService.getChatRoomsForUser(currentUser.getId()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to get chat rooms: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/join/{roomId}")
+    public ResponseEntity<?> joinRoom(@PathVariable String roomId) {
+        log.info("Adding current user to room {}", roomId);
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDTO currentUser = (UserDTO) authentication.getPrincipal();
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .body(chatRoomService
+                            .addUserToRoom(ChatRoomDTO.builder().id(roomId).build(), currentUser));
+        } catch (UserExistsException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User is already in room");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to add user to room: " + e.getMessage());
+        }
+    }
 }

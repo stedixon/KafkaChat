@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,5 +28,9 @@ public class MessageService {
         chatMessageDTO.setTimeSent(Instant.now());
         messageProducer.sendMessage(chatRoomId, chatMessageDTO);
         return messageRepository.save(chatMessageDTO);
+    }
+
+    public List<ChatMessageDTO> getMessagesForChatRoom(String chatRoomId) {
+        return messageRepository.findByChatRoomId(chatRoomId);
     }
 }

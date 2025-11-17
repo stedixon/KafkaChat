@@ -7,6 +7,7 @@ import com.testapp.domain.dto.UserDTO;
 import com.testapp.exceptions.UserExistsException;
 import com.testapp.repository.ChatRoomRepository;
 import com.testapp.repository.RoomManagementRepository;
+import com.testapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final RoomManagementRepository roomManagementRepository;
+    private final UserRepository userRepository;
 
     public ChatRoomDetails getChatRoom(String id) {
         Optional<ChatRoomDTO> chatRoom = chatRoomRepository.findById(id);
@@ -61,12 +63,45 @@ public class ChatRoomService {
     }
 
     public RoomManagement addUserToRoom(ChatRoomDTO chatRoomDTO, UserDTO user) {
+        // Validate that the chat room exists
+        Optional<ChatRoomDTO> roomOptional = chatRoomRepository.findById(chatRoomDTO.getId());
+        if (roomOptional.isEmpty()) {
+            throw new RuntimeException("Chat room with id " + chatRoomDTO.getId() + " does not exist");
+        }
+        ChatRoomDTO room = roomOptional.get();
+
+        // Validate that the user exists
+        Optional<UserDTO> userOptional = userRepository.findById(user.getId());
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException("User with id " + user.getId() + " does not exist");
+        }
+        UserDTO userEntity = userOptional.get();
+
+        // Check if user is already in the room
         Optional<RoomManagement> existing = roomManagementRepository.findByUserIdAndChatRoomId(user.getId(), chatRoomDTO.getId());
         if (existing.isPresent()) {
             throw new UserExistsException("User " + user.getId() + " is already in chat room " + chatRoomDTO.getId());
         }
 
-        return roomManagementRepository.save(new RoomManagement(user, chatRoomDTO));
+        // Create RoomManagement with proper embedded ID
+        RoomManagement roomManagement = RoomManagement.builder()
+                .id(new RoomManagement.RoomManagementId(user.getId(), room.getId()))
+                .user(userEntity)
+                .chatRoom(room)
+                .isAdmin(false)
+                .build();
+
+        return roomManagementRepository.save(roomManagement);
+    }
+
+    public List<ChatRoomDetails> getChatRoomsForUser(String userId) {
+        List<RoomManagement> roomManagements = roomManagementRepository.findByUserId(userId);
+        return roomManagements.stream()
+                .map(rm -> {
+                    int participantCount = roomManagementRepository.findParticipantCountByChatRoomId(rm.getChatRoom().getId());
+                    return createRoomDetails(rm.getChatRoom(), participantCount);
+                })
+                .collect(Collectors.toList());
     }
 
     private ChatRoomDetails createRoomDetails(ChatRoomDTO room, int participantCount) {

@@ -37,4 +37,8 @@ public class UserService {
         user.setId(UUID.randomUUID().toString());
         return userRepository.save(user);
     }
+
+    public List<UserDTO> getAllUsers() {
+        return userRepository.findAll();
+    }
 }

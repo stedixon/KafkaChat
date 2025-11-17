@@ -44,6 +44,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
+        // Skip JWT filter for auth endpoints, WebSocket endpoints, and OPTIONS requests
+        String path = request.getRequestURI();
+        String connectionHeader = request.getHeader("Connection");
+        boolean isWebSocketUpgrade = connectionHeader != null && connectionHeader.toLowerCase().contains("upgrade");
+        
+        if (path.startsWith("/auth/") || 
+            path.startsWith("/server/") || 
+            "OPTIONS".equals(request.getMethod()) ||
+            isWebSocketUpgrade) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {

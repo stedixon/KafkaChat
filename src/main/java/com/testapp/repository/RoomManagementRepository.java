@@ -17,4 +17,7 @@ public interface RoomManagementRepository extends JpaRepository<RoomManagement, 
     List<RoomManagement> findByChatRoomId(@Param("chatRoomId") String chatRoomId);
 
     Optional<RoomManagement> findByUserIdAndChatRoomId(String userId, String chatRoomId);
+
+    @Query(value = "select * from room_management where user_id = :userId", nativeQuery = true)
+    List<RoomManagement> findByUserId(@Param("userId") String userId);
 }

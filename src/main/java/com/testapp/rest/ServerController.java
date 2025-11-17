@@ -12,11 +12,14 @@ import jakarta.websocket.Session;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+@Component
 @ServerEndpoint(value = "/server/message/{chatRoom}",
         decoders = MessageDecoder.class,
         encoders = MessageEncoder.class )
@@ -75,12 +78,25 @@ public class ServerController {
         chatEndpoints.forEach(endpoint -> {
             synchronized (endpoint) {
                 try {
-                    endpoint.session.getBasicRemote().
-                            sendObject(message);
+                    // Only broadcast to endpoints in the same room
+                    String endpointRoom = rooms.get(endpoint.session.getId());
+                    if (endpointRoom != null && endpointRoom.equals(message.getChatRoomName())) {
+                        endpoint.session.getBasicRemote().
+                                sendObject(message);
+                    }
                 } catch (IOException | EncodeException e) {
                     e.printStackTrace();
                 }
             }
         });
+    }
+
+    // Public method to broadcast messages from Kafka consumer
+    public static void broadcastMessage(ChatMessage message) {
+        try {
+            broadcast(message);
+        } catch (IOException | EncodeException e) {
+            e.printStackTrace();
+        }
     }
 }
