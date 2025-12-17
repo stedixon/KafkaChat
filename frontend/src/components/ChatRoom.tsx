@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { messageApi, chatRoomApi } from '../services/api';
+import { messageApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useMessageNotifications } from '../context/MessageNotificationContext';
 import AddUserModal from './AddUserModal';
@@ -17,56 +17,22 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ room, onBack }) => {
   const [sending, setSending] = useState(false);
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { user } = useAuth();
-  const { resetUnreadCount, addMessageToRoom, roomMessages } = useMessageNotifications();
+  const { resetUnreadCount } = useMessageNotifications();
 
   useEffect(() => {
     loadMessages();
     resetUnreadCount(room.id); // Reset unread count when room is opened
     
-    // Connect WebSocket after a small delay to ensure room is loaded
-    const wsTimeout = setTimeout(() => {
-      connectWebSocket();
-    }, 100);
+    // Poll for new messages every 2 seconds
+    const pollInterval = setInterval(() => {
+      loadMessages();
+    }, 1000);
 
     return () => {
-      clearTimeout(wsTimeout);
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
-      if (wsRef.current) {
-        wsRef.current.close();
-        wsRef.current = null;
-      }
+      clearInterval(pollInterval);
     };
   }, [room.id]);
-
-  // Also listen to roomMessages from notification context for the active room
-  useEffect(() => {
-    const contextMessages = roomMessages[room.id] || [];
-    if (contextMessages.length > 0) {
-      // Merge with current messages, avoiding duplicates
-      setMessages((prev) => {
-        const existingIds = new Set(prev.map(m => m.id));
-        const newMessages = contextMessages.filter(m => !existingIds.has(m.id));
-        if (newMessages.length > 0) {
-          console.log(`[ChatRoom] Adding ${newMessages.length} new messages from context`);
-          const merged = [...prev, ...newMessages].sort((a, b) => 
-            new Date(a.timeSent).getTime() - new Date(b.timeSent).getTime()
-          );
-          return merged;
-        }
-        // If no new messages but context has more messages, sync to ensure we have all
-        if (contextMessages.length > prev.length) {
-          console.log(`[ChatRoom] Syncing messages from context (context: ${contextMessages.length}, current: ${prev.length})`);
-          return contextMessages;
-        }
-        return prev;
-      });
-    }
-  }, [roomMessages[room.id]?.length, room.id]); // Use length to trigger on new messages
 
   useEffect(() => {
     scrollToBottom();
@@ -82,115 +48,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ room, onBack }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const connectWebSocket = () => {
-    // Close existing connection if any
-    if (wsRef.current) {
-      if (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING) {
-        wsRef.current.close();
-      }
-      wsRef.current = null;
-    }
-
-    // Clear any pending reconnection
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = null;
-    }
-
-    // WebSocket URL - adjust based on your backend WebSocket endpoint
-    const wsUrl = `ws://localhost:8080/server/message/${room.id}`;
-    const websocket = new WebSocket(wsUrl);
-    wsRef.current = websocket;
-
-    websocket.onopen = () => {
-      console.log(`[ChatRoom] WebSocket connected for room ${room.id}`);
-      // Clear any pending reconnection on successful connection
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-        reconnectTimeoutRef.current = null;
-      }
-    };
-
-    websocket.onmessage = async (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log(`[ChatRoom] WebSocket message received:`, data);
-        
-        // Only process actual messages, not connection/disconnection messages
-        if (data.message && data.chatRoomName === room.id && 
-            data.message !== 'Connected' && data.message !== 'Disconnected') {
-          console.log(`[ChatRoom] Processing new message for active room ${room.id}`);
-          
-          // Retry mechanism to fetch the message from API (in case of timing issues)
-          const fetchWithRetry = async (retries = 3, delay = 200) => {
-            for (let i = 0; i < retries; i++) {
-              try {
-                const messages = await messageApi.getMessages(room.id);
-                console.log(`[ChatRoom] Fetched ${messages.length} messages from API (attempt ${i + 1})`);
-                
-                if (messages && messages.length > 0) {
-                  const latestMessage = messages[messages.length - 1];
-                  
-                  // Check if this is actually a new message (compare with current messages)
-                  setMessages((prev) => {
-                    const existingIds = new Set(prev.map(m => m.id));
-                    if (existingIds.has(latestMessage.id)) {
-                      console.log(`[ChatRoom] Message ${latestMessage.id} already in list`);
-                      return prev;
-                    }
-                    
-                    console.log(`[ChatRoom] Adding new message ${latestMessage.id} to active room`);
-                    const updated = [...prev, latestMessage].sort((a, b) => 
-                      new Date(a.timeSent).getTime() - new Date(b.timeSent).getTime()
-                    );
-                    // Also add to notification context
-                    addMessageToRoom(room.id, latestMessage);
-                    return updated;
-                  });
-                  
-                  return; // Success, exit retry loop
-                }
-              } catch (err) {
-                console.error(`[ChatRoom] Failed to fetch messages (attempt ${i + 1}):`, err);
-                if (i < retries - 1) {
-                  await new Promise(resolve => setTimeout(resolve, delay));
-                }
-              }
-            }
-          };
-          
-          // Start fetching with retry
-          fetchWithRetry();
-        } else {
-          console.log(`[ChatRoom] Ignoring message:`, data);
-        }
-      } catch (err) {
-        console.error('[ChatRoom] Failed to parse WebSocket message:', err, event.data);
-      }
-    };
-
-    websocket.onerror = (error) => {
-      console.error(`[ChatRoom] WebSocket error for room ${room.id}:`, error);
-    };
-
-    websocket.onclose = (event) => {
-      console.log(`[ChatRoom] WebSocket disconnected for room ${room.id}`, event.code, event.reason);
-      
-      // Only attempt to reconnect if the close was not intentional (not a normal close)
-      // Code 1000 = normal closure, 1001 = going away, 1005 = no status code
-      // Don't reconnect if we're cleaning up (wsRef.current is null means we intentionally closed it)
-      if (wsRef.current !== null && event.code !== 1000) {
-        console.log(`[ChatRoom] Attempting to reconnect WebSocket for room ${room.id} in 3 seconds...`);
-        reconnectTimeoutRef.current = setTimeout(() => {
-          console.log(`[ChatRoom] Reconnecting WebSocket for room ${room.id}...`);
-          connectWebSocket();
-        }, 3000);
-      } else {
-        wsRef.current = null;
-      }
-    };
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {

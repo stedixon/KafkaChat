@@ -56,7 +56,7 @@ const Chat: React.FC = () => {
         </div>
         <div style={styles.mainContent}>
           {selectedRoom ? (
-            <ChatRoom room={selectedRoom} onBack={() => setSelectedRoom(null)} />
+            <ChatRoom key={selectedRoom.id} room={selectedRoom} onBack={() => setSelectedRoom(null)} />
           ) : (
             <div style={styles.emptyState}>
               <h2>Select a chat room to start chatting</h2>
